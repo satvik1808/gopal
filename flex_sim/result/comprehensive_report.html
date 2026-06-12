@@ -196,6 +196,72 @@
                     </div>
                 </div>
             </div>
+
+            <div style="grid-column: 1 / -1; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <h2 style="border: none; padding: 0; margin-bottom: 20px; font-size: 1.5rem;">Low Frequency Maneuver: 0.04 Hz Square Wave Tracking</h2>
+                <p>We finally tested a low-frequency &plusmn;50&deg; square wave at 0.04 Hz. This frequency is just below the controller's design bandwidth (0.05 Hz) and well below the flexible mode frequencies, allowing the system enough time to settle during each half-cycle.</p>
+                
+                <div class="grid-2">
+                    <div>
+                        <h3 style="color: var(--warning-color);">Uncompensated Response</h3>
+                        <p style="font-size: 0.95rem;">Even at this low command frequency, the sharp edges of the square wave command act like a step input, broadband-exciting the structure. The uncompensated system still chatters at the resonant frequencies as it attempts to hold the target attitude.</p>
+                        <div class="image-container">
+                            <img src="./uncompensated_square_0.04hz_results.png" alt="Uncompensated 0.04 Hz Square Wave Simulation Results">
+                        </div>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--success-color);">Compensated Response (Notch Filters Active)</h3>
+                        <p style="font-size: 0.95rem;">With the Notch Filters active, the system easily tracks the slow square wave. The sharp edges of the command are smoothed out at the problematic frequencies, preventing resonant excitation and leading to a clean, stable limit cycle around the target attitude.</p>
+                        <div class="image-container">
+                            <img src="./compensated_square_0.04hz_results.png" alt="Compensated 0.04 Hz Square Wave Simulation Results">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="grid-column: 1 / -1; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <h2 style="border: none; padding: 0; margin-bottom: 20px; font-size: 1.5rem;">Ultra-Low Frequency Maneuver: 0.005 Hz Square Wave Tracking</h2>
+                <p>To conclude the tracking analysis, we tested an ultra-low frequency &plusmn;50&deg; square wave at 0.005 Hz. With a period of 200 seconds, this is essentially a sequence of very widely spaced step commands, allowing us to observe the true steady-state limit cycle behavior between transitions.</p>
+                
+                <div class="grid-2">
+                    <div>
+                        <h3 style="color: var(--warning-color);">Uncompensated Response</h3>
+                        <p style="font-size: 0.95rem;">Because the sudden edges of the square wave command still contain high-frequency energy, the uncompensated system experiences massive structural excitation at every transition. It takes a long time for these vibrations to settle naturally, causing the thrusters to work erratically to maintain attitude.</p>
+                        <div class="image-container">
+                            <img src="./uncompensated_square_0.005hz_results.png" alt="Uncompensated 0.005 Hz Square Wave Simulation Results">
+                        </div>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--success-color);">Compensated Response (Notch Filters Active)</h3>
+                        <p style="font-size: 0.95rem;">With the Notch Filters, the system performs a clean step maneuver at each command edge, rapidly settling into the designed minimum-pulse limit cycle. The solar panel vibrations are immediately damped out, demonstrating perfect steady-state performance.</p>
+                        <div class="image-container">
+                            <img src="./compensated_square_0.005hz_results.png" alt="Compensated 0.005 Hz Square Wave Simulation Results">
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div style="grid-column: 1 / -1; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <h2 style="border: none; padding: 0; margin-bottom: 20px; font-size: 1.5rem;">Delay Stress Test: 0.005 Hz Square Wave Tracking with 100 ms Computation Delay</h2>
+                <p>We ran the ultra-low frequency 0.005 Hz square wave tracking test again, but this time we intentionally increased the <strong>computation delay from 16 ms to 100 ms</strong>. Delay severely degrades phase margin, making this a critical stress test for our Notch Filter compensated system.</p>
+                
+                <div class="grid-2">
+                    <div>
+                        <h3 style="color: var(--warning-color);">Uncompensated Response</h3>
+                        <p style="font-size: 0.95rem;">The additional delay completely breaks the uncompensated system. The limit cycle amplitude grows, the thruster chattering becomes even more continuous and severe, and the solar panels undergo massive sustained vibrations, potentially leading to structural failure.</p>
+                        <div class="image-container">
+                            <img src="./uncompensated_square_0.005hz_delay100_results.png" alt="Uncompensated 0.005 Hz Square Wave with 100ms Delay Simulation Results">
+                        </div>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--success-color);">Compensated Response (Notch Filters Active)</h3>
+                        <p style="font-size: 0.95rem;">Even with 100 ms of pure computational delay eating into the phase margin, the Notch Filters successfully stabilize the system! It handles the large step maneuvers and settles into a stable, tightly bounded limit cycle, proving the exceptional robustness of the compensator design.</p>
+                        <div class="image-container">
+                            <img src="./compensated_square_0.005hz_delay100_results.png" alt="Compensated 0.005 Hz Square Wave with 100ms Delay Simulation Results">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -226,14 +292,14 @@
             </div>
         </div>
 
-        <p><strong>Open-Loop Bode Plot:</strong> Notice the sharp "notches" at 3.14 rad/s (0.5 Hz) and 12.56 rad/s (2.0 Hz), cleanly cancelling the resonant peaks of the plant.</p>
+        <p><strong>Open-Loop Bode Plot:</strong> The comparison below clearly demonstrates the effectiveness of the compensator. The Uncompensated system (orange) exhibits massive resonant peaks at 3.14 rad/s (0.5 Hz) and 12.56 rad/s (2.0 Hz) which cross 0 dB and heavily destabilize the system. The Compensated system (green) uses the sharp "notches" to cleanly cancel those peaks, ensuring robust gain and phase margins.</p>
         <div class="image-container">
-            <img src="./bode_plot.png" alt="Open Loop Bode Plot">
+            <img src="./bode_comparison.png" alt="Open Loop Bode Plot Comparison">
         </div>
 
-        <p style="margin-top: 40px;"><strong>Nyquist Plot:</strong> The contour safely avoids encircling the critical point at <strong>-1+j0</strong>, satisfying the Nyquist stability criterion and providing a visual confirmation of the excellent phase and gain margins.</p>
+        <p style="margin-top: 40px;"><strong>Nyquist Plot Comparison:</strong> When viewed on the complex plane, the uncompensated system (orange) features massive resonant loops that sweep dangerously close to and potentially encircle the critical point at <strong>-1+j0</strong> (red dot), indicating instability or highly oscillatory behavior. The compensated system (green) safely avoids the critical point, providing a visual confirmation of the excellent phase and gain margins achieved by the Notch Filters.</p>
         <div class="image-container" style="max-width: 600px; margin-left: auto; margin-right: auto;">
-            <img src="./nyquist_plot.png" alt="Nyquist Plot">
+            <img src="./nyquist_comparison.png" alt="Nyquist Plot Comparison">
         </div>
     </div>
 </div>
