@@ -1,0 +1,4 @@
+Bode plot saved to /Users/satviksingh/projects/gopal/flex_sim/result/bode_plot.png
+Nyquist plot saved to /Users/satviksingh/projects/gopal/flex_sim/result/nyquist_plot.png
+Phase Margin: 57.40 deg at 0.58 rad/s
+Gain Margin: 22.26 dB at 2.51 rad/s

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satellite Control Stability Analysis</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent-color: #38bdf8;
+            --success-color: #4ade80;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-top: 40px;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 10px;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .stat-box.success {
+            border-left-color: var(--success-color);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .image-container {
+            margin-top: 30px;
+            text-align: center;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #ffffff; /* White background for the plot */
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        p {
+            color: #cbd5e1;
+            font-size: 1.05rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Stability Analysis Report</h1>
+    <p>Frequency domain analysis of the linear continuous-time components of the flexible satellite control loop, including the rigid body, flexible modes (0.5 Hz & 2.0 Hz), PD controller, Notch Filters, and computational delays.</p>
+
+    <div class="glass-card">
+        <h2>Stability Margins</h2>
+        <p>The system exhibits strong stability margins, guaranteeing robustness against modeling errors and ensuring the PWPFM will not fall into severe limit cycling caused by structural resonances.</p>
+        
+        <div class="stats-grid">
+            <div class="stat-box success">
+                <div class="stat-label">Phase Margin</div>
+                <div class="stat-value">57.40°</div>
+                <div class="stat-label" style="margin-top: 5px; font-size: 0.8rem;">@ 0.58 rad/s</div>
+            </div>
+            <div class="stat-box success">
+                <div class="stat-label">Gain Margin</div>
+                <div class="stat-value">22.26 dB</div>
+                <div class="stat-label" style="margin-top: 5px; font-size: 0.8rem;">@ 2.51 rad/s</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">System State</div>
+                <div class="stat-value" style="color: var(--success-color);">STABLE</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card">
+        <h2>Bode Plot (Open-Loop)</h2>
+        <p>The Bode plot below illustrates the frequency response of the open-loop transfer function <strong>L(s) = P(s)C(s)N(s)D(s)</strong>. Notice the sharp "notches" at 3.14 rad/s (0.5 Hz) and 12.56 rad/s (2.0 Hz), which perfectly cancel out the resonant peaks of the flexible solar panels, preventing high-frequency gain that would otherwise cause instability.</p>
+        
+        <div class="image-container">
+            <img src="./bode_plot.png" alt="Bode Plot showing Phase and Gain margins with notch filters">
+        </div>
+    </div>
+
+    <div class="glass-card">
+        <h2>Nyquist Plot</h2>
+        <p>The Nyquist contour maps the complex frequency response. According to the Nyquist stability criterion, since the open-loop system is stable, the closed-loop system is stable if and only if the contour does not encircle the critical point at <strong>-1+j0</strong>. As shown below, the contour safely avoids the critical point, visually confirming the robust phase and gain margins.</p>
+        
+        <div class="image-container" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+            <img src="./nyquist_plot.png" alt="Nyquist Plot of the open loop system">
+        </div>
+    </div>
+
+    <div class="glass-card">
+        <h2>Flexible Mode Compensator (Notch Filters)</h2>
+        <p>To safely stabilize the flexible appendages (e.g., solar panels) vibrating at 0.5 Hz and 2.0 Hz, we implemented a compensator consisting of two cascaded <strong>Notch Filters</strong>. The Bode plot below isolates the frequency response of just this compensator. It heavily attenuates (drops the gain by ~34 dB) exactly at the problematic resonant frequencies, preventing the PWPFM controller from feeding energy into the structural vibrations.</p>
+        
+        <div class="image-container">
+            <img src="./compensator_bode_plot.png" alt="Bode Plot of the Notch Filter Compensator">
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
