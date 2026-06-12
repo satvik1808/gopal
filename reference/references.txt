@@ -5,10 +5,61 @@
    - Provides standard formulations and tuning techniques for the PWPFM (Pulse-Width Pulse-Frequency Modulator), consisting of a first-order lag filter and a Schmitt trigger.
 
 3. Krovel, T. D. (2005). "Optimal tuning of PWPF modulator for attitude control." Norwegian University of Science and Technology.
-   - Typical values for Schmitt trigger thresholds: U_on = 0.45 U_m, U_off = 0.15 U_m.
+   - Discusses optimal tuning criteria and the relationship between Schmitt trigger thresholds and minimum pulse width.
 
-4. Open literature parameters used for simulation:
-   - Bandwidth = 0.05 Hz
-   - Damping ratio = 0.9
-   - Computational Delay = 16 ms
-   - RCS System Delay = 64 ms
+---------------------------------------------------------
+TUNING DETAILS AND CALCULATIONS
+---------------------------------------------------------
+
+1. PID Controller Tuning (PD actually)
+For a rigid spacecraft, the attitude dynamics model is a double integrator: Inertia (I) * angular_acceleration = Torque.
+If we use a Proportional-Derivative (PD) controller, we can match the closed-loop system to the standard second-order system equation.
+
+Given constraints:
+*   Bandwidth: 0.05 Hz
+*   Damping ratio: 0.9
+*   Inertia: 10 kg*m^2
+
+First, calculate the natural frequency (omega_n) in radians per second:
+*   omega_n = 2 * pi * 0.05 = 0.314 rad/s
+
+Then, calculate the gains:
+*   Proportional Gain (Kp) = Inertia * (omega_n^2) = 10 * (0.314^2) = 0.98 Nm/rad
+*   Derivative Gain (Kd) = Inertia * 2 * damping * omega_n = 10 * 2 * 0.9 * 0.314 = 5.65 Nm*s/rad
+
+*(Note: Integral gain (Ki) is omitted because integrating attitude error in space usually causes massive overshoot known as "integral wind-up" due to the lack of gravity or atmospheric drag.)*
+
+2. PWPFM Tuning
+The PWPFM converts the continuous torque command from the PID into discrete on/off thruster pulses. It introduces a deadband (steady-state error) and a minimum pulse width (the shortest time a thruster is allowed to fire).
+
+A. Designing the Deadband (Km and U_on)
+The PWPFM will not fire unless the commanded torque generates a filter state that exceeds U_on. The equation for this deadband is:
+Torque Deadband = U_on / Km
+
+Target: Satellite stops within ~1 degree of the target.
+*   1 degree is about 0.017 radians.
+*   Commanded torque for 1 degree of error = Kp * 0.017 = 0.98 * 0.017 = 0.016 Nm.
+
+So, U_on / Km needs to be roughly 0.016 Nm.
+Chosen values: Km = 5.0 and U_on = 0.1, giving a deadband of 0.02 Nm (roughly 1.1 degrees of steady-state error).
+
+B. Designing the Minimum Pulse Width (Tm and U_off)
+Real RCS thrusters have a minimum firing time of about 20 to 50 milliseconds. The minimum pulse width (tau_min) of a PWPFM can be approximated by:
+tau_min = Tm * ln( (Km * U_m + U_on) / (Km * U_m + U_off) )
+
+*   We know U_m = 1.0 Nm (max thruster torque).
+*   Chosen U_off = 0.03 (roughly one-third of U_on to provide good hysteresis and prevent rapid chatter).
+
+Targeting a minimum pulse width of roughly 50 ms (0.05 seconds):
+*   0.05 = Tm * ln( (5.0 * 1.0 + 0.1) / (5.0 * 1.0 + 0.03) )
+*   0.05 = Tm * ln( 5.1 / 5.03 )
+*   0.05 = Tm * 0.0138
+*   Tm = 3.5 seconds
+
+Summary of Final Parameters:
+- Kp: 0.98
+- Kd: 5.65
+- Km: 5.0
+- Tm: 3.5 s
+- U_on: 0.1
+- U_off: 0.03
