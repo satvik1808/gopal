@@ -1,0 +1,14 @@
+1. Sidi, M. J. (1997). Spacecraft Dynamics and Control: A Practical Engineering Approach. Cambridge University Press. 
+   - Explains the rigid body dynamics of satellites and the design of PID controllers for attitude control.
+
+2. Song, Y. et al. "Pulse-width pulse-frequency modulator for satellite attitude control." IEEE Transactions on Aerospace and Electronic Systems.
+   - Provides standard formulations and tuning techniques for the PWPFM (Pulse-Width Pulse-Frequency Modulator), consisting of a first-order lag filter and a Schmitt trigger.
+
+3. Krovel, T. D. (2005). "Optimal tuning of PWPF modulator for attitude control." Norwegian University of Science and Technology.
+   - Typical values for Schmitt trigger thresholds: U_on = 0.45 U_m, U_off = 0.15 U_m.
+
+4. Open literature parameters used for simulation:
+   - Bandwidth = 0.05 Hz
+   - Damping ratio = 0.9
+   - Computational Delay = 16 ms
+   - RCS System Delay = 64 ms

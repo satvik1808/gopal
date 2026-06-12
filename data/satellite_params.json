@@ -1,0 +1,23 @@
+{
+    "satellite": {
+        "inertia": 10.0,
+        "max_torque": 1.0
+    },
+    "controller": {
+        "bandwidth_hz": 0.05,
+        "damping": 0.9,
+        "comp_delay_ms": 16,
+        "rcs_delay_ms": 64
+    },
+    "pwpfm": {
+        "Km": 5.0,
+        "Tm": 3.5,
+        "Uon": 0.1,
+        "Uoff": 0.03
+    },
+    "simulation": {
+        "dt": 0.001,
+        "t_end": 100.0,
+        "step_target_deg": 50.0
+    }
+}
